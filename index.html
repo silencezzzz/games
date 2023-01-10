@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            display: flex;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .wrapper .left,
+        .wrapper .right {
+            width: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 23vw;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+
+        .wrapper .left{
+            background: #ff3988;
+        }
+        .wrapper .right {
+            background: #695fff;
+        }
+
+        .fontClick {
+            color: red !important;
+            font-size: 6vw !important;
+            background-color:white !important;
+
+        }
+        .wrapper .next-btn{
+            position: absolute;
+            bottom: 60px;
+            right: 60px;
+        }
+        .next-btn  .reset {
+            line-height: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 40px;
+            background: red;
+            margin-bottom: 16px;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+        }
+
+        .next-btn  .next_question {
+            line-height: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 40px;
+            background: #ff3988;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+
+
+        }
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="left">A</div>
+    <div class="right">B</div>
+    <div class="next-btn">
+        <div class="reset">重置</div>
+        <div class="next_question">下一题</div>
+    </div>
+
+</div>
+
+
+</body>
+
+</html>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="array.js"></script>
+
+<script>
+
+
+    //样式
+    $(".left").click(function(){
+        $(".left").addClass("fontClick")
+        $(".left").text(thisSelect[0])
+
+    });
+    $(".right").click(function(){
+        $(".right").addClass("fontClick")
+        $(".right").text(thisSelect[1])
+    });
+    $(".next_question").click(function(e){
+        if($(".right").hasClass("fontClick")){
+            $(".right").removeClass("fontClick")
+        }
+        if($(".left").hasClass("fontClick")){
+            $(".left").removeClass("fontClick")
+        }
+        $(".right").text("B")
+        $(".left").text("A")
+
+        localSelect ++;
+        console.log(localData.length)
+        if(localSelect >= localData.length){
+            confirm("题库已抽完，马上重置题库")
+            //将缓存清除
+            $(".reset").click()
+            return
+
+
+        }
+        console.log(localSelect)
+        localStorage.setItem('selectKey', localSelect);
+        thisSelect = shuffleThisQuestion(localData[localSelect])
+
+
+        e.preventDefault();
+        e.stopPropagation()
+    });
+
+    $(".reset").click(function(){
+        var res = confirm("确认重置吗")
+        if(res){
+           //将缓存清除
+            localStorage.clear()
+            location.reload()
+
+        }
+    });
+    $(document).ready(function(){
+
+        localData = localStorage.getItem('questionListString');
+        localData = JSON.parse(localData)
+        if(!localData) {
+            questionList = shuffle(questionList)
+            localData = questionList
+            localStorage.setItem('questionListString',JSON.stringify(questionList))
+        }
+        localSelect = localStorage.getItem('selectKey');
+        if (!localSelect) {
+            localSelect = 0;
+            localStorage.setItem('selectKey', localSelect);
+        }
+        if(localSelect > localData.length){
+            localStorage.clear()
+        }
+        thisSelect = shuffleThisQuestion(localData[localSelect])
+
+
+
+
+
+    })
+    function shuffleThisQuestion($data){
+        rand = Math.random()
+        if(rand > 0.5){
+            //置换AB
+            let temp = $data[0];
+            $data[0] = $data[1];
+            $data[1] = temp;
+        }
+        return $data
+    }
+
+    //获取题目
+    function shuffle(arr) {
+        var len = arr.length
+        //倒叙遍历该数组
+        for(var i = arr.length - 1; i >= 0; i--) {
+            // 产生一个在数字长度内的随机数
+            var randomIndex = Math.floor(Math.random() * (i + 1));
+            // 作为数组下标去取数组该位置的值
+            var itemIndex = arr[randomIndex];
+            // 随机的位置与该位置互换
+            arr[randomIndex] = arr[i];
+            arr[i] = itemIndex;
+        }
+        return arr;
+    }
+
+</script>
